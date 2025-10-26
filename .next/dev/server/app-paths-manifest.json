@@ -1,7 +1,0 @@
-{
-  "/api/upload/route": "app/api/upload/route.js",
-  "/dashboard/data-processing/page": "app/dashboard/data-processing/page.js",
-  "/dashboard/file-upload/page": "app/dashboard/file-upload/page.js",
-  "/page": "app/page.js",
-  "/python-charts/page": "app/python-charts/page.js"
-}
