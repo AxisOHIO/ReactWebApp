@@ -161,7 +161,7 @@ export async function POST(req) {
     console.log('Processing file:', file.name, `${(file.size / 1024).toFixed(1)}KB`);
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const s3Key = `uploads/${Date.now()}_${file.name}`;
+    const s3Key = `posture/${Date.now()}_${file.name}`;
     
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,

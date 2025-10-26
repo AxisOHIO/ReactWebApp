@@ -255,35 +255,48 @@ const DataProcessingPage = () => {
         plugins: {
           title: {
             display: true,
-            text: 'Posture Status Frequency Over Time'
+            text: 'Posture Status Frequency Over Time',
+            color: 'white'
           },
           legend: {
-            position: 'top'
+            position: 'top',
+            labels: {
+              color: 'white'
+            }
           }
         },
         scales: {
           x: {
             title: {
               display: true,
-              text: 'Time'
+              text: 'Time',
+              color: 'white'
             },
             ticks: {
               maxRotation: 45,
-              minRotation: 0
+              minRotation: 0,
+              color: 'white'
             },
             grid: {
               display: true,
-              color: '#e5e7eb',
+              color: 'rgba(255, 255, 255, 0.2)',
               lineWidth: 1
             }
           },
           y: {
             title: {
               display: true,
-              text: 'Percentage (%)'
+              text: 'Percentage (%)',
+              color: 'white'
+            },
+            ticks: {
+              color: 'white'
             },
             beginAtZero: true,
-            max: 100
+            max: 100,
+            grid: {
+              color: 'rgba(255, 255, 255, 0.2)'
+            }
           }
         }
       }
@@ -314,35 +327,48 @@ const DataProcessingPage = () => {
         plugins: {
           title: {
             display: true,
-            text: 'Good Posture Comparison Across Users'
+            text: 'Good Posture Comparison Across Users',
+            color: 'white'
           },
           legend: {
-            position: 'top'
+            position: 'top',
+            labels: {
+              color: 'white'
+            }
           }
         },
         scales: {
           x: {
             title: {
               display: true,
-              text: 'Time'
+              text: 'Time',
+              color: 'white'
             },
             ticks: {
               maxRotation: 45,
-              minRotation: 0
+              minRotation: 0,
+              color: 'white'
             },
             grid: {
               display: true,
-              color: '#e5e7eb',
+              color: 'rgba(255, 255, 255, 0.2)',
               lineWidth: 1
             }
           },
           y: {
             title: {
               display: true,
-              text: 'Good Posture (%)'
+              text: 'Good Posture (%)',
+              color: 'white'
+            },
+            ticks: {
+              color: 'white'
             },
             beginAtZero: true,
-            max: 100
+            max: 100,
+            grid: {
+              color: 'rgba(255, 255, 255, 0.2)'
+            }
           }
         }
       }
@@ -358,30 +384,36 @@ const DataProcessingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen p-6 pt-24">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h1 className="text-2xl font-bold mb-4 text-gray-900">Access JSON Data from S3</h1>
-          <p className="text-gray-700 mb-6">Fetch and combine all JSON files from posture folder</p>
+        <div className={`liquid-glass rounded-2xl p-8 ${loading ? 'loading' : ''}`}>
+          <h1 className="text-2xl font-bold mb-4 text-white">Access JSON Data from S3</h1>
+          <p className="text-white/80 mb-6">Fetch and combine all JSON files from posture folder</p>
           
           <button
             onClick={fetchData}
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400"
+            className="w-full bg-blue-600 text-white py-3 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center"
           >
+            {loading && (
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            )}
             {loading ? 'Fetching...' : 'Fetch All Posture Data'}
           </button>
 
           {availableUserIds.length > 0 && (
             <div className="mt-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Chart Type:
                 </label>
                 <select
                   value={chartType}
                   onChange={(e) => setChartType(e.target.value)}
-                  className="inline-block p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mr-4"
+                  className="inline-block p-2 bg-black border border-white/30 rounded text-white focus:ring-2 focus:ring-white/50 focus:border-white/50 mr-4"
                 >
                   <option value="individual">Individual User</option>
                   <option value="multiuser">All Users (Good Posture)</option>
@@ -390,13 +422,13 @@ const DataProcessingPage = () => {
               
               {chartType === 'individual' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-white mb-2">
                     Select User ID:
                   </label>
                   <select
                     value={selectedUserId}
                     onChange={(e) => handleUserIdChange(e.target.value)}
-                    className="inline-block p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="inline-block p-2 bg-black border border-white/30 rounded text-white focus:ring-2 focus:ring-white/50 focus:border-white/50"
                   >
                     {availableUserIds.map(userId => (
                       <option key={userId} value={userId}>{userId}</option>
@@ -416,15 +448,15 @@ const DataProcessingPage = () => {
           {jsonData && (
             <div className="mt-6 space-y-6">
               <div>
-                <h2 className="text-lg font-semibold mb-3 text-gray-900">Posture Status Chart:</h2>
-                <div className="bg-white p-4 rounded border" style={{ height: '400px' }}>
+                <h2 className="text-lg font-semibold mb-3 text-white">Posture Status Chart:</h2>
+                <div className="bg-black/30 border border-white/20 p-4 rounded" style={{ height: '400px' }}>
                   <canvas ref={chartRef}></canvas>
                 </div>
               </div>
               
               <div>
-                <h2 className="text-lg font-semibold mb-3 text-gray-900">Raw JSON Data:</h2>
-                <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto max-h-96 text-gray-900">
+                <h2 className="text-lg font-semibold mb-3 text-white">Raw JSON Data:</h2>
+                <pre className="bg-black/30 border border-white/20 p-4 rounded text-sm overflow-auto max-h-96 text-white">
                   {JSON.stringify(jsonData, null, 2)}
                 </pre>
               </div>

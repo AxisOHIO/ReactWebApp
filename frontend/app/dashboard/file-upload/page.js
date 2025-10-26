@@ -81,12 +81,12 @@ const FileUploadPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen p-6 pt-24">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className={`liquid-glass rounded-2xl p-8 ${uploading ? 'loading' : ''}`}>
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">File Upload to S3</h1>
-            <p className="text-gray-600">Upload and process your files with AI analysis</p>
+            <h1 className="text-3xl font-bold text-white mb-2">File Upload to S3</h1>
+            <p className="text-white/80">Upload and process your files with AI analysis</p>
           </div>
 
           <div 
@@ -116,15 +116,15 @@ const FileUploadPage = () => {
               
               {file ? (
                 <div className="space-y-2">
-                  <p className="text-lg font-medium text-green-700">{file.name}</p>
-                  <p className="text-sm text-gray-500">{formatFileSize(file.size)}</p>
+                  <p className="text-lg font-medium text-white">{file.name}</p>
+                  <p className="text-sm text-white/60">{formatFileSize(file.size)}</p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-lg font-medium text-gray-700">
+                  <p className="text-lg font-medium text-white">
                     {dragActive ? 'Drop your file here' : 'Choose a file or drag it here'}
                   </p>
-                  <p className="text-sm text-gray-500">Maximum file size: 10MB</p>
+                  <p className="text-sm text-white/60">Maximum file size: 10MB</p>
                 </div>
               )}
             </div>
@@ -157,7 +157,7 @@ const FileUploadPage = () => {
                   setError(null);
                   setResult(null);
                 }}
-                className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-6 py-3 border border-white/30 rounded-lg text-white hover:bg-white/10 transition-colors"
                 disabled={uploading}
               >
                 Clear
