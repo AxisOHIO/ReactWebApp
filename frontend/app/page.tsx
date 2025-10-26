@@ -4,9 +4,12 @@ export default function Home() {
 
   // Sample images for the infinite gallery ADD HERE THE IMAGES YOU WANT TO SHOW
   const sampleImages = [
-    { src: '/1.png', alt: 'Image 1' },
-    { src: '/2.webp', alt: 'Image 2' },
+    { src: '/1.webp', alt: 'Image 1' },
+    { src: '/2.png', alt: 'Image 2' },
     { src: '/3.png', alt: 'Image 3' },
+    { src: '/4.png', alt: 'Image 4' },
+    { src: '/5.png', alt: 'Image 5' },
+    { src: '/6.png', alt: 'Image 5' },
   ];
 
 	return (
