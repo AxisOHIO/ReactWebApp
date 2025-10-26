@@ -1,7 +1,6 @@
 "use client"
 
 import { motion } from 'framer-motion';
-import { Trophy, Medal, Award, User } from 'lucide-react';
 
 interface LeaderboardProps {
   category: string;
@@ -47,19 +46,6 @@ const getInitials = (name: string) => {
     .toUpperCase();
 };
 
-const getRankIcon = (rank: number) => {
-  switch (rank) {
-    case 1:
-      return <Trophy className="w-5 h-5 text-yellow-400" />;
-    case 2:
-      return <Medal className="w-5 h-5 text-gray-300" />;
-    case 3:
-      return <Award className="w-5 h-5 text-amber-600" />;
-    default:
-      return <span className="text-white/40 font-mono text-sm">{rank}</span>;
-  }
-};
-
 export default function Leaderboard({ category, region }: LeaderboardProps) {
   const key = `${category}-${region}`;
   const data = leaderboardData[key] || leaderboardData['All Time-Global'];
@@ -69,47 +55,54 @@ export default function Leaderboard({ category, region }: LeaderboardProps) {
       key={key}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-3"
+      className="space-y-1"
     >
       {data.map((player, index) => (
         <motion.div
           key={player.rank}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: index * 0.1 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.05 }}
           className={`
-            relative flex items-center gap-4 p-4 rounded-xl transition-all duration-300
+            relative flex items-center gap-4 p-3 rounded-lg transition-all duration-200
             ${player.rank <= 3 
-              ? 'bg-white/10 border border-white/20 hover:bg-white/15' 
-              : 'bg-white/5 border border-white/10 hover:bg-white/8'
+              ? 'bg-white/5 hover:bg-white/8' 
+              : 'bg-transparent hover:bg-white/3'
             }
           `}
         >
-          {/* Rank Icon */}
-          <div className="flex items-center justify-center w-10 h-10">
-            {getRankIcon(player.rank)}
+          {/* Rank */}
+          <div className="w-6 text-right">
+            <span className={`text-xs font-mono ${
+              player.rank <= 3 ? 'text-white' : 'text-white/40'
+            }`}>
+              {player.rank}
+            </span>
           </div>
           
-          {/* User Avatar */}
+          {/* Avatar */}
           <div 
-            className="w-12 h-12 rounded-full flex items-center justify-center font-semibold text-white text-sm"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium text-white"
             style={{ backgroundColor: player.color }}
           >
             {getInitials(player.name)}
           </div>
           
-          {/* User Info */}
+          {/* Name */}
           <div className="flex-1">
-            <p className="text-white font-medium text-base">{player.name}</p>
-            <p className="text-white/50 text-xs font-mono">
-              {player.score.toLocaleString()} points
+            <p className={`text-sm ${
+              player.rank <= 3 ? 'text-white font-medium' : 'text-white/80'
+            }`}>
+              {player.name}
             </p>
           </div>
           
-          {/* Rank Badge */}
-          <div className="bg-white/10 px-3 py-1 rounded-full">
-            <p className="text-white text-xs font-mono font-semibold">
-              #{player.rank}
+          {/* Score */}
+          <div className="text-right">
+            <p className={`text-xs font-mono ${
+              player.rank <= 3 ? 'text-white' : 'text-white/60'
+            }`}>
+              {player.score.toLocaleString()}
             </p>
           </div>
         </motion.div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Header from '../components/header';
 
 const PythonChartsPage = () => {
   const [loading, setLoading] = useState(false);
@@ -37,11 +38,13 @@ const PythonChartsPage = () => {
   };
 
   return (
-    <div className="min-h-screen p-6 pt-24">
+    <div className="min-h-screen bg-black">
+      <Header />
+      <div className="p-6 pt-24">
       <div className="max-w-4xl mx-auto">
         <div className={`liquid-glass rounded-2xl p-8 ${loading ? 'loading' : ''}`}>
           <h1 className="text-2xl font-bold mb-4 text-white">Python Generated Charts</h1>
-          <p className="text-white/80 mb-6">Generate posture analysis charts using Python processing</p>
+          <p className="text-white/80 mb-6 italic">find your <span className="italic">balance</span></p>
           
           <div className="space-y-4 mb-6">
             <div>
@@ -119,6 +122,7 @@ const PythonChartsPage = () => {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

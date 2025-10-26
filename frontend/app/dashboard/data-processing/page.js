@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
+import Header from '../../components/header';
 
 Chart.register(...registerables);
 
@@ -384,11 +385,13 @@ const DataProcessingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen p-6 pt-24">
+    <div className="min-h-screen bg-black">
+      <Header />
+      <div className="p-6 pt-24">
       <div className="max-w-4xl mx-auto">
         <div className={`liquid-glass rounded-2xl p-8 ${loading ? 'loading' : ''}`}>
           <h1 className="text-2xl font-bold mb-4 text-white">Access JSON Data from S3</h1>
-          <p className="text-white/80 mb-6">Fetch and combine all JSON files from posture folder</p>
+          <p className="text-white/80 mb-6 italic">find your <span className="italic">balance</span></p>
           
           <button
             onClick={fetchData}
@@ -463,6 +466,7 @@ const DataProcessingPage = () => {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
