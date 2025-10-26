@@ -586,10 +586,10 @@ Contributions are welcome! Please follow these steps:
 
 ## 👥 Authors
 
-- Enes Yilmaz
-- Colin Lee
-- Rithvik Allamaneni
-- Varun Sathyajeeth
+- Enes
+- Colin
+- Rithvik
+- Varun
 
 ---
 
