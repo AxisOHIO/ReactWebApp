@@ -3,10 +3,11 @@ import InfiniteGallery from './components/InfiniteGallery';
 export default function Home() {
 
   // Sample images for the infinite gallery ADD HERE THE IMAGES YOU WANT TO SHOW
-	const sampleImages = [
-		{ src: '/1.webp', alt: 'Image 1' },
-		{ src: '/2.webp', alt: 'Image 2' },
-	];
+  const sampleImages = [
+    { src: '/1.png', alt: 'Image 1' },
+    { src: '/2.webp', alt: 'Image 2' },
+    { src: '/3.png', alt: 'Image 3' },
+  ];
 
 	return (
 		<main className="min-h-screen ">
