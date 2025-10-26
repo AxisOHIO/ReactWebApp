@@ -1,0 +1,89 @@
+{
+  "userId": "user123",
+  "sessions": [
+    {
+      "timestamp": "2025-10-25T14:30:00Z",
+      "pitch": -32.5,
+      "roll": -11.2,
+      "status": "bad"
+    },
+    {
+      "timestamp": "2025-10-25T14:30:05Z",
+      "pitch": -5.2,
+      "roll": -2.1,
+      "status": "good"
+    },
+    {
+      "timestamp": "2025-10-25T14:30:10Z",
+      "pitch": -18.7,
+      "roll": -8.4,
+      "status": "moderate"
+    },
+    {
+      "timestamp": "2025-10-25T14:30:15Z",
+      "pitch": -2.8,
+      "roll": 1.3,
+      "status": "good"
+    },
+    {
+      "timestamp": "2025-10-25T14:30:20Z",
+      "pitch": -25.1,
+      "roll": -9.7,
+      "status": "bad"
+    },
+    {
+      "timestamp": "2025-10-25T14:30:25Z",
+      "pitch": -12.3,
+      "roll": -4.6,
+      "status": "moderate"
+    },
+    {
+      "timestamp": "2025-10-25T14:30:30Z",
+      "pitch": -3.1,
+      "roll": 0.8,
+      "status": "good"
+    },
+    {
+      "timestamp": "2025-10-25T14:30:35Z",
+      "pitch": -28.9,
+      "roll": -12.4,
+      "status": "bad"
+    },
+    {
+      "timestamp": "2025-10-25T14:30:40Z",
+      "pitch": -7.2,
+      "roll": -3.1,
+      "status": "good"
+    },
+    {
+      "timestamp": "2025-10-25T14:30:45Z",
+      "pitch": -15.6,
+      "roll": -6.8,
+      "status": "moderate"
+    },
+    {
+      "timestamp": "2025-10-25T14:30:50Z",
+      "pitch": -1.9,
+      "roll": 2.1,
+      "status": "good"
+    },
+    {
+      "timestamp": "2025-10-25T14:30:55Z",
+      "pitch": -22.7,
+      "roll": -10.3,
+      "status": "bad"
+    },
+    {
+      "timestamp": "2025-10-25T14:31:00Z",
+      "pitch": -9.4,
+      "roll": -2.7,
+      "status": "moderate"
+    },
+    {
+      "timestamp": "2025-10-25T14:31:05Z",
+      "pitch": -4.3,
+      "roll": 1.6,
+      "status": "good"
+    }
+  ]
+}
