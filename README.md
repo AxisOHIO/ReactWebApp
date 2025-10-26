@@ -13,6 +13,7 @@ A Next.js web application for uploading, processing, and analyzing posture data 
 
 - **Frontend**: Next.js 16, React 19, Tailwind CSS
 - **Backend**: Next.js API Routes
+- **Languages**: JavaScript, TypeScript, Python
 - **Storage**: AWS S3
 - **Processing**: Python with boto3
 - **Charts**: Chart.js

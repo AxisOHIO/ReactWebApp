@@ -101,8 +101,8 @@ async function handleGetAll() {
       return NextResponse.json({ error: 'No files found in posture folder' }, { status: 404 });
     }
 
-    // Fetch all JSON files
-    const allData = { userId: 'combined', sessions: [] };
+    // Fetch all JSON files as separate objects
+    const allFiles = [];
     
     for (const file of files) {
       if (file.Key.endsWith('.json')) {
@@ -117,7 +117,12 @@ async function handleGetAll() {
           const jsonData = JSON.parse(text);
           
           if (jsonData.sessions) {
-            allData.sessions.push(...jsonData.sessions);
+            // Sort sessions within each file
+            jsonData.sessions.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            allFiles.push({
+              filename: file.Key,
+              ...jsonData
+            });
           }
         } catch (fileError) {
           console.error(`Error reading file ${file.Key}:`, fileError.message);
@@ -125,10 +130,7 @@ async function handleGetAll() {
       }
     }
 
-    // Sort sessions by timestamp
-    allData.sessions.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-    return NextResponse.json(allData);
+    return NextResponse.json({ files: allFiles });
   } catch (error) {
     console.error('GETALL failed:', error.message);
     return NextResponse.json({ error: 'Failed to fetch all files', details: error.message }, { status: 500 });

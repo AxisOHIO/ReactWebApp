@@ -9,6 +9,9 @@ const DataProcessingPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [jsonData, setJsonData] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [availableUserIds, setAvailableUserIds] = useState([]);
+  const [chartType, setChartType] = useState('individual');
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
@@ -20,12 +23,32 @@ const DataProcessingPage = () => {
       const res = await fetch('/api/upload?action=getall');
       
       if (res.ok) {
-        const data = await res.json();
-        setJsonData(data);
+        const response = await res.json();
         
-        setTimeout(() => {
-          createChart(data);
-        }, 100);
+        // Extract unique userIds
+        const userIds = [...new Set(response.files.map(file => file.userId).filter(Boolean))];
+        setAvailableUserIds(userIds);
+        
+        // Set default userId if not selected
+        const defaultUserId = selectedUserId || userIds[0];
+        if (!selectedUserId && userIds.length > 0) {
+          setSelectedUserId(defaultUserId);
+        }
+        
+        const filteredData = filterDataByUserId(response.files, defaultUserId);
+        setJsonData({ files: response.files, filtered: filteredData });
+        
+        if (chartType === 'individual' && filteredData.sessions && filteredData.sessions.length > 0) {
+          setTimeout(() => {
+            const chartData = generateChartData(filteredData.sessions);
+            createChart(chartData);
+          }, 100);
+        } else if (chartType === 'multiuser') {
+          setTimeout(() => {
+            const chartData = generateMultiUserChartData(response.files);
+            createMultiUserChart(chartData);
+          }, 100);
+        }
       } else {
         const errorData = await res.json();
         setError(errorData.error);
@@ -37,7 +60,159 @@ const DataProcessingPage = () => {
     }
   };
 
-  const createChart = (data) => {
+  const handleUserIdChange = (userId) => {
+    setSelectedUserId(userId);
+    if (jsonData) {
+      const filteredData = filterDataByUserId(jsonData.files, userId);
+      setJsonData({ ...jsonData, filtered: filteredData });
+      
+      if (chartType === 'individual') {
+        if (filteredData.sessions && filteredData.sessions.length > 0) {
+          setTimeout(() => {
+            const chartData = generateChartData(filteredData.sessions);
+            createChart(chartData);
+          }, 100);
+        } else {
+          if (chartInstance.current) {
+            chartInstance.current.destroy();
+            chartInstance.current = null;
+          }
+        }
+      }
+    }
+  };
+
+  const filterDataByUserId = (files, targetUserId) => {
+    // Find files that match the target userId
+    const matchingFiles = files.filter(file => file.userId === targetUserId);
+    
+    if (matchingFiles.length === 0) {
+      return { userId: targetUserId, sessions: [] };
+    }
+    
+    // Combine sessions from matching files
+    const allSessions = [];
+    matchingFiles.forEach(file => {
+      if (file.sessions) {
+        allSessions.push(...file.sessions);
+      }
+    });
+    
+    // Sort combined sessions by timestamp
+    allSessions.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    
+    return { userId: targetUserId, sessions: allSessions };
+  };
+
+  const generateChartData = (sessions) => {
+    const numGroups = 10;
+    const groupSize = Math.ceil(sessions.length / numGroups);
+    
+    const labels = [];
+    const goodData = [];
+    const badData = [];
+    
+    for (let i = 0; i < numGroups; i++) {
+      const start = i * groupSize;
+      const end = Math.min(start + groupSize, sessions.length);
+      const group = sessions.slice(start, end);
+      
+      if (group.length === 0) break;
+      
+      const startTime = new Date(group[0].timestamp);
+      labels.push(startTime.toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit'
+      }));
+      
+      const goodCount = group.filter(s => s.status === 'good').length;
+      const badCount = group.filter(s => s.status === 'bad' || s.status === 'moderate').length;
+      const total = goodCount + badCount;
+      
+      const goodPercentage = total > 0 ? (goodCount / total) * 100 : 0;
+      const badPercentage = total > 0 ? (badCount / total) * 100 : 0;
+      
+      goodData.push(goodPercentage);
+      badData.push(badPercentage);
+    }
+    
+    return { labels, goodData, badData };
+  };
+
+  const generateMultiUserChartData = (files) => {
+    const userDataMap = {};
+    
+    // Group sessions by userId
+    files.forEach(file => {
+      if (file.userId && file.sessions) {
+        if (!userDataMap[file.userId]) {
+          userDataMap[file.userId] = [];
+        }
+        userDataMap[file.userId].push(...file.sessions);
+      }
+    });
+    
+    const numGroups = 10;
+    const labels = [];
+    const datasets = [];
+    const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#84cc16'];
+    
+    // Generate time labels based on first user's data
+    const firstUserId = Object.keys(userDataMap)[0];
+    if (firstUserId) {
+      const sessions = userDataMap[firstUserId].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      const groupSize = Math.ceil(sessions.length / numGroups);
+      
+      for (let i = 0; i < numGroups; i++) {
+        const start = i * groupSize;
+        const group = sessions.slice(start, start + groupSize);
+        if (group.length > 0) {
+          const startTime = new Date(group[0].timestamp);
+          labels.push(startTime.toLocaleTimeString('en-US', { 
+            hour12: false, 
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit'
+          }));
+        }
+      }
+    }
+    
+    // Generate dataset for each user
+    Object.keys(userDataMap).forEach((userId, index) => {
+      const sessions = userDataMap[userId].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      const groupSize = Math.ceil(sessions.length / numGroups);
+      const goodData = [];
+      
+      for (let i = 0; i < numGroups; i++) {
+        const start = i * groupSize;
+        const end = Math.min(start + groupSize, sessions.length);
+        const group = sessions.slice(start, end);
+        const goodCount = group.filter(s => s.status === 'good').length;
+        const badCount = group.filter(s => s.status === 'bad' || s.status === 'moderate').length;
+        const total = goodCount + badCount;
+        
+        const goodPercentage = total > 0 ? (goodCount / total) * 100 : 0;
+        goodData.push(goodPercentage);
+      }
+      
+      datasets.push({
+        label: userId,
+        data: goodData,
+        borderColor: colors[index % colors.length],
+        backgroundColor: `${colors[index % colors.length]}20`,
+        borderWidth: 2,
+        fill: false,
+        tension: 0.1
+      });
+    });
+    
+    return { labels, datasets };
+  };
+
+  const createChart = (chartData) => {
     if (!chartRef.current) {
       console.error('Chart canvas not found');
       return;
@@ -48,72 +223,29 @@ const DataProcessingPage = () => {
     }
 
     const ctx = chartRef.current.getContext('2d');
-    const sessions = data.sessions;
     
-    console.log('Creating chart with data:', sessions);
-    
-    // Divide sessions into 10 equal groups
-    const numGroups = 10;
-    const groupSize = Math.ceil(sessions.length / numGroups);
-    
-    const labels = [];
-    const goodData = [];
-    const moderateData = [];
-    const badData = [];
-    
-    for (let i = 0; i < numGroups; i++) {
-      const start = i * groupSize;
-      const end = Math.min(start + groupSize, sessions.length);
-      const group = sessions.slice(start, end);
-      
-      if (group.length === 0) break;
-      
-      // Create label from first timestamp in group
-      const startTime = new Date(group[0].timestamp);
-      labels.push(startTime.toLocaleTimeString('en-US', { 
-        hour12: false, 
-        hour: '2-digit', 
-        minute: '2-digit',
-        second: '2-digit'
-      }));
-      
-      // Count statuses in this group
-      const goodCount = group.filter(s => s.status === 'good').length;
-      const moderateCount = group.filter(s => s.status === 'moderate').length;
-      const badCount = group.filter(s => s.status === 'bad').length;
-      
-      goodData.push(goodCount);
-      moderateData.push(moderateCount);
-      badData.push(badCount);
-    }
-
-    console.log('Chart data:', { labels, goodData, moderateData, badData });
-
     chartInstance.current = new Chart(ctx, {
-      type: 'bar',
+      type: 'line',
       data: {
-        labels: labels,
+        labels: chartData.labels,
         datasets: [
           {
             label: 'Good',
-            data: goodData,
-            backgroundColor: '#10b981',
-            borderColor: '#059669',
-            borderWidth: 1
-          },
-          {
-            label: 'Moderate',
-            data: moderateData,
-            backgroundColor: '#f59e0b',
-            borderColor: '#d97706',
-            borderWidth: 1
+            data: chartData.goodData,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.1
           },
           {
             label: 'Bad',
-            data: badData,
-            backgroundColor: '#ef4444',
-            borderColor: '#dc2626',
-            borderWidth: 1
+            data: chartData.badData,
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.1
           }
         ]
       },
@@ -148,9 +280,69 @@ const DataProcessingPage = () => {
           y: {
             title: {
               display: true,
-              text: 'Count'
+              text: 'Percentage (%)'
             },
-            beginAtZero: true
+            beginAtZero: true,
+            max: 100
+          }
+        }
+      }
+    });
+  };
+
+  const createMultiUserChart = (chartData) => {
+    if (!chartRef.current) {
+      console.error('Chart canvas not found');
+      return;
+    }
+
+    if (chartInstance.current) {
+      chartInstance.current.destroy();
+    }
+
+    const ctx = chartRef.current.getContext('2d');
+    
+    chartInstance.current = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: chartData.labels,
+        datasets: chartData.datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Good Posture Comparison Across Users'
+          },
+          legend: {
+            position: 'top'
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Time'
+            },
+            ticks: {
+              maxRotation: 45,
+              minRotation: 0
+            },
+            grid: {
+              display: true,
+              color: '#e5e7eb',
+              lineWidth: 1
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Good Posture (%)'
+            },
+            beginAtZero: true,
+            max: 100
           }
         }
       }
@@ -179,6 +371,41 @@ const DataProcessingPage = () => {
           >
             {loading ? 'Fetching...' : 'Fetch All Posture Data'}
           </button>
+
+          {availableUserIds.length > 0 && (
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Chart Type:
+                </label>
+                <select
+                  value={chartType}
+                  onChange={(e) => setChartType(e.target.value)}
+                  className="inline-block p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mr-4"
+                >
+                  <option value="individual">Individual User</option>
+                  <option value="multiuser">All Users (Good Posture)</option>
+                </select>
+              </div>
+              
+              {chartType === 'individual' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select User ID:
+                  </label>
+                  <select
+                    value={selectedUserId}
+                    onChange={(e) => handleUserIdChange(e.target.value)}
+                    className="inline-block p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    {availableUserIds.map(userId => (
+                      <option key={userId} value={userId}>{userId}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+          )}
 
           {error && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
