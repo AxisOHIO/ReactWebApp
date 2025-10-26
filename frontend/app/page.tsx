@@ -1,4 +1,5 @@
 import InfiniteGallery from './components/InfiniteGallery';
+import Header from './components/header';
 
 export default function Home() {
 
@@ -13,7 +14,8 @@ export default function Home() {
   ];
 
 	return (
-		<main className="min-h-screen ">
+		<main className="min-h-screen overflow-hidden">
+			<Header />
 			<InfiniteGallery
 				images={sampleImages}
 				speed={1.2}

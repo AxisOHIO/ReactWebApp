@@ -220,7 +220,17 @@ function GalleryScene({
 }: Omit<InfiniteGalleryProps, 'className' | 'style'>) {
 	const [scrollVelocity, setScrollVelocity] = useState(0);
 	const [autoPlay, setAutoPlay] = useState(true);
+	const [introComplete, setIntroComplete] = useState(false);
 	const lastInteraction = useRef(Date.now());
+
+	// Intro animation: start with high velocity
+	useEffect(() => {
+		setScrollVelocity(12); // Start with fast scroll (higher = faster zoom)
+		const timer = setTimeout(() => {
+			setIntroComplete(true);
+		}, 800); // 0.8 seconds intro
+		return () => clearTimeout(timer);
+	}, []);
 
 	// Normalize images to objects
 	const normalizedImages = useMemo(
@@ -298,6 +308,7 @@ function GalleryScene({
 			event.preventDefault();
 			setScrollVelocity((prev) => prev + event.deltaY * 0.01 * speed);
 			setAutoPlay(false);
+			setIntroComplete(true); // End intro on user interaction
 			lastInteraction.current = Date.now();
 		},
 		[speed]
@@ -309,10 +320,12 @@ function GalleryScene({
 			if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
 				setScrollVelocity((prev) => prev - 2 * speed);
 				setAutoPlay(false);
+				setIntroComplete(true); // End intro on user interaction
 				lastInteraction.current = Date.now();
 			} else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
 				setScrollVelocity((prev) => prev + 2 * speed);
 				setAutoPlay(false);
+				setIntroComplete(true); // End intro on user interaction
 				lastInteraction.current = Date.now();
 			}
 		},
@@ -343,13 +356,14 @@ function GalleryScene({
 	}, []);
 
 	useFrame((state, delta) => {
-		// Apply auto-play
-		if (autoPlay) {
+		// Apply auto-play (only after intro is complete)
+		if (autoPlay && introComplete) {
 			setScrollVelocity((prev) => prev + 0.3 * delta);
 		}
 
-		// Damping
-		setScrollVelocity((prev) => prev * 0.95);
+		// Damping - slower damping during intro for smooth deceleration
+		const dampingFactor = introComplete ? 0.95 : 0.97;
+		setScrollVelocity((prev) => prev * dampingFactor);
 
 		// Update time uniform for all materials
 		const time = state.clock.getElapsedTime();
