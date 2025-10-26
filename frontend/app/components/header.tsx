@@ -42,7 +42,7 @@ export default function Header() {
           </svg>
         </button>
         <button className="px-6 py-2 rounded-full bg-white text-black font-normal text-xs transition-all duration-300 hover:bg-white/90 h-8 flex items-center z-10 cursor-pointer">
-          Download
+          Meet the Team
         </button>
       </div>
 
