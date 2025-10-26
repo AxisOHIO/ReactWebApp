@@ -1,13 +1,16 @@
 # AXIS - Posture Analysis System
 
-A Next.js web application for uploading, processing, and analyzing posture data using AWS S3 and Python processing.
+A Next.js web application for uploading, processing, and analyzing posture data using AWS S3 and Python processing with interactive dashboards and advanced chart generation.
 
 ## Features
 
 - **File Upload**: Drag & drop interface for uploading files to AWS S3
+- **Interactive Dashboard**: Chart.js visualizations with multi-user support
+- **Python Charts**: Matplotlib-generated charts with dark theme styling
 - **Data Processing**: Python scripts process uploaded posture data
-- **Data Visualization**: Interactive charts showing posture status over time
+- **Multi-User Analysis**: Compare posture data across different users
 - **S3 Integration**: Secure file storage and retrieval from AWS S3
+- **Liquid Glass UI**: Modern glassmorphism design with responsive navigation
 
 ## Tech Stack
 
@@ -15,8 +18,9 @@ A Next.js web application for uploading, processing, and analyzing posture data 
 - **Backend**: Next.js API Routes
 - **Languages**: JavaScript, TypeScript, Python
 - **Storage**: AWS S3
-- **Processing**: Python with boto3
-- **Charts**: Chart.js
+- **Processing**: Python with boto3, pandas, matplotlib
+- **Charts**: Chart.js, Matplotlib
+- **Styling**: Tailwind CSS with custom liquid-glass effects
 - **Deployment**: Vercel-ready
 
 ## Project Structure
@@ -25,13 +29,22 @@ A Next.js web application for uploading, processing, and analyzing posture data 
 AXIS/
 ├── frontend/
 │   ├── app/
-│   │   ├── api/upload/          # S3 upload/download API
-│   │   ├── file-upload/         # File upload page
-│   │   ├── data-processing/     # Data analysis page
-│   │   └── globals.css          # Global styles
+│   │   ├── api/
+│   │   │   ├── upload/          # S3 upload/download API
+│   │   │   └── python-chart/    # Python chart generation API
+│   │   ├── dashboard/
+│   │   │   ├── file-upload/     # File upload page
+│   │   │   └── data-processing/ # Interactive dashboard
+│   │   ├── python-charts/       # Python-generated charts page
+│   │   ├── components/
+│   │   │   └── header.tsx       # Navigation header
+│   │   └── globals.css          # Global styles with liquid-glass
 │   ├── data.json               # Sample posture data
 │   ├── process_s3_file.py      # Python processing script
 │   └── package.json            # Dependencies
+├── python-processing/
+│   ├── chart_generator.py      # Matplotlib chart generation
+│   └── requirements.txt        # Python dependencies
 └── README.md
 ```
 
@@ -55,7 +68,9 @@ AXIS/
 
 3. **Install Python dependencies:**
    ```bash
-   pip install boto3 pandas pillow
+   pip install boto3 pandas matplotlib numpy
+   # Or use requirements file:
+   pip install -r python-processing/requirements.txt
    ```
 
 4. **Run the development server:**
@@ -66,20 +81,36 @@ AXIS/
 ## Usage
 
 ### File Upload
-- Navigate to `/file-upload`
+- Navigate to `/dashboard/file-upload`
 - Drag & drop files or click to select
-- Files are uploaded to S3 and processed with Python
+- Files are uploaded to S3 posture folder and processed with Python
 
-### Data Analysis
-- Navigate to `/data-processing`
+### Interactive Dashboard
+- Navigate to `/dashboard/data-processing`
 - Fetch and analyze posture data from S3
-- View interactive charts showing posture trends
+- Select individual users or compare all users
+- View Chart.js line charts with percentage-based data
+
+### Python Charts
+- Navigate to `/python-charts`
+- Generate matplotlib charts with advanced styling
+- Choose timeframe (7 or 30 days)
+- Toggle between posture analysis and cause breakdown
+- Dark theme charts with professional styling
 
 ## API Endpoints
 
-- `POST /api/upload` - Upload files to S3
+- `POST /api/upload` - Upload files to S3 posture folder
 - `GET /api/upload?key=filename` - Download specific file from S3
 - `GET /api/upload?action=getall` - Fetch all files from posture folder
+- `POST /api/python-chart` - Generate matplotlib charts with timeframe and type parameters
+
+## Navigation
+
+- **Upload** - File upload interface
+- **Dashboard** - Interactive Chart.js visualizations
+- **Charts** - Python-generated matplotlib charts
+- **Logo** - Click to return to home page
 
 ## Data Format
 
